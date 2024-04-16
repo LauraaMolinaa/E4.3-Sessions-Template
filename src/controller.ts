@@ -11,9 +11,20 @@ export const getHome = async (req: IncomingMessage, res: ServerResponse) => {
      * 4. Set the response header "Set-Cookie" to the session id.
      * 5. End the response by rendering the HomeView template.
      */
-
+    
+    const session = getSession(req)
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/html");
+    res.setHeader("Set-Cookie", [ 
+        `session_id=${session.id}`
+    ])  
+
+    if (session.data.isLoggedIn)
+    {
+        res.end(await renderTemplate("src/views/HomeView.hbs", {
+            title: `Welcome ${session.data.name}!`,
+        }),)
+    }
     res.end(
         await renderTemplate("src/views/HomeView.hbs", {
             title: "Welcome Guest!",
@@ -32,7 +43,14 @@ export const login = async (req: IncomingMessage, res: ServerResponse) => {
      * 7. Set the response header "Set-Cookie" to the session id.
      * 8. End the response.
      */
-
+    const session = getSession(req)
+    const body = await parseBody(req);
+    //const name = body.split(":")[1]
+    session.data = {
+        name: body.name,
+        isLoggedIn: true
+    }
+    //console.log(session.data)
     res.statusCode = 303;
     res.setHeader("Location", "/");
     res.end();
@@ -51,13 +69,17 @@ export const getAllPokemon = async (
      *    Pass the title "All Pokemon", the database of pokemon, and the session data isLoggedIn.
      * 6. In ListView.hbs, only display the form to create a new pokemon if the user is logged in.
      */
-
+    const session = getSession(req)
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/html");
+    res.setHeader("Set-Cookie", [
+        `session_id=${session.id}`
+    ]);
     res.end(
         await renderTemplate("src/views/ListView.hbs", {
             title: "All Pokemon",
             pokemon: database,
+            session: session.data.isLoggedIn
         }),
     );
 };
@@ -89,7 +111,7 @@ export const createPokemon = async (
      *
      * Finally, grab the session and set the session cookie.
      */
-
+    const session = getSession(req)
     const body = await parseBody(req);
     const newPokemon = {
         id: database.length + 1, // ID "auto-increment".
@@ -97,11 +119,18 @@ export const createPokemon = async (
         type: body.type,
     };
 
-    database.push(newPokemon);
-
-    res.statusCode = 303;
-    res.setHeader("Location", "/pokemon");
-    res.end();
+    if (session.data.isLoggedIn)
+    {
+        database.push(newPokemon);
+        res.statusCode = 303;
+        res.setHeader("Location", "/pokemon");
+        res.end();
+    }
+    res.statusCode = 401; 
+    res.end(await renderTemplate("src/views/ErrorView.hbs", {
+        message: "You must be logged in to view this page"
+    }))
+    
 };
 
 const parseBody = async (req: IncomingMessage) => {
