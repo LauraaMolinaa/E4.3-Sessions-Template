@@ -119,6 +119,9 @@ export const createPokemon = async (
         type: body.type,
     };
 
+    res.setHeader("Set-Cookie", [
+        `session_id=${session.id}`
+    ])
     if (session.data.isLoggedIn)
     {
         database.push(newPokemon);
