@@ -27,6 +27,10 @@
 </table>
 {{/ unless }}
 
+{{# unless session}}
+<h3 style="font-weight: bold;">You are not logged in so, I can not allow you to create a pokemon</h3>
+
+{{else}}
 <form method="POST" action="/pokemon" id="new-pokemon-form">
 	<div>
 		<label for="name">Name:</label>
@@ -40,3 +44,4 @@
 
 	<button>Create</button>
 </form>
+{{/ unless }}

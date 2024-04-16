@@ -16,3 +16,8 @@
 			</ul>
 		</nav>
 	</header>
+
+	<form action="{{ path 'login' }}" method="POST">
+		<input type="text" name="name" placeholder="Name">
+		<button type="submit">Login</button>
+	</form>
