@@ -93,9 +93,14 @@ export const logout = async (req: IncomingMessage, res: ServerResponse) => {
      * 5. Set the response header "Set-Cookie" to the session id with the expiration date.
      * 6. End the response.
      */
-
+    const session = getSession(req)
+    session.data.expire = new Date("2024/04/15")
     res.statusCode = 303;
     res.setHeader("Location", "/");
+    res.setHeader("Set-Cookie", [
+        `session_id=${session.id}`, 
+        `Expires=${session.data.expire}`
+    ])
     res.end();
 };
 

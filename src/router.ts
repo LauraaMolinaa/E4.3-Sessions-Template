@@ -28,3 +28,4 @@ routes.GET["/"] = getHome;
 routes.GET["/pokemon"] = getAllPokemon;
 routes.POST["/pokemon"] = createPokemon;
 routes.POST["/login"] = login; 
+routes.GET["/logout?"] = logout;
