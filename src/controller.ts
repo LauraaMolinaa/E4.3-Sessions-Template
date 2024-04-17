@@ -98,8 +98,7 @@ export const logout = async (req: IncomingMessage, res: ServerResponse) => {
     res.statusCode = 303;
     res.setHeader("Location", "/");
     res.setHeader("Set-Cookie", [
-        `session_id=${session.id}`, 
-        `Expires=${session.data.expire}`
+        `session_id=${session.id};Expires=${session.data.expire}`
     ])
     res.end();
 };
